@@ -346,4 +346,7 @@ Aeronautical Engineer | C++ and Python Software Development | Aviation Technolog
 
 ## License
 
-No license has been selected yet. A license file can be added before public release.
+## License
+
+This project is licensed under the MIT License.
+See the LICENSE file for details.
