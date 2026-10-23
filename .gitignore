@@ -1,0 +1,16 @@
+
+# C++ build files
+*.exe
+*.obj
+*.pdb
+*.ilk
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated datasets and results
+data/*.csv
+
+# VS Code local settings
+.vscode/
