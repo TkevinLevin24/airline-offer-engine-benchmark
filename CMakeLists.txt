@@ -30,3 +30,60 @@ else()
     target_compile_options(airline-engine PRIVATE -Wall -Wextra)
     target_compile_options(benchmark-cpp PRIVATE -Wall -Wextra)
 endif()
+
+# Enable automated testing
+enable_testing()
+
+# Unit test executable
+add_executable(
+    test-pricing
+    tests/test_pricing.cpp
+)
+
+
+target_include_directories(
+    test-pricing
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/cpp
+)
+
+
+# Register the test with CTest
+add_test(
+    NAME PricingTests
+    COMMAND test-pricing
+)
+
+# Flight filter unit tests
+add_executable(
+    test-filter
+    tests/test_filter.cpp
+)
+
+target_include_directories(
+    test-filter
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/cpp
+)
+
+add_test(
+    NAME FlightFilterTests
+    COMMAND test-filter
+)
+
+# Offer sorting unit tests
+add_executable(
+    test-sort
+    tests/test_sort.cpp
+)
+
+target_include_directories(
+    test-sort
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/cpp
+)
+
+add_test(
+    NAME OfferSortTests
+    COMMAND test-sort
+)

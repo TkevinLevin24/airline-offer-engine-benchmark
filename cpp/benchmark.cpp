@@ -7,6 +7,9 @@
 #include <algorithm>
 #include <chrono>
 #include <iomanip>
+#include "pricing.h"
+#include "flight_filter.h"
+#include "offer_sort.h"
 #include <stdexcept>
 
 // Flight information
@@ -56,14 +59,9 @@ std::vector<Flight> loadFlights(const std::string& filename) {
     return flights;
 }
 
-// Calculate price in cents
+// Calculate price in cents using the shared pricing function
 long long calculatePriceCents(const Flight& flight) {
-    long long taxes =
-        (flight.baseFareCents * 15 + 50) / 100;
-
-    const long long serviceFee = 2000;
-
-    return flight.baseFareCents + taxes + serviceFee;
+    return calculatePriceCents(flight.baseFareCents);
 }
 
 // Filter, calculate and sort offers
@@ -72,28 +70,32 @@ std::vector<Offer> processOffers(
 ) {
     std::vector<Offer> matchingOffers;
 
-    for (const Flight& flight : flights) {
-        if (flight.origin == "BOG" &&
-            flight.destination == "MIA") {
+   for (const Flight& flight : flights) {
+    if (matchesRoute(
+            flight.origin,
+            flight.destination,
+            "BOG",
+            "MIA")) {
 
-            matchingOffers.push_back({
-                calculatePriceCents(flight),
-                flight.flightNumber
-            });
-        }
+        matchingOffers.push_back({
+            calculatePriceCents(flight),
+            flight.flightNumber
+        });
     }
+}
 
     std::sort(
-        matchingOffers.begin(),
-        matchingOffers.end(),
-        [](const Offer& a, const Offer& b) {
-            if (a.totalPriceCents != b.totalPriceCents) {
-                return a.totalPriceCents < b.totalPriceCents;
-            }
-
-            return a.flightNumber < b.flightNumber;
-        }
-    );
+    matchingOffers.begin(),
+    matchingOffers.end(),
+    [](const Offer& a, const Offer& b) {
+        return offerComesFirst(
+            a.totalPriceCents,
+            a.flightNumber,
+            b.totalPriceCents,
+            b.flightNumber
+        );
+    }
+);
 
     return matchingOffers;
 }
