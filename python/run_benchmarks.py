@@ -8,7 +8,7 @@ from pathlib import Path
 # Project configuration
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PYTHON_DIR = PROJECT_ROOT / "python"
-CPP_EXECUTABLE = PROJECT_ROOT / "benchmark-cpp.exe"
+CPP_EXECUTABLE = PROJECT_ROOT / "build" / "Release" / "benchmark-cpp.exe"
 
 DATASET_SIZES = [10000, 100000, 1000000]
 SESSIONS = 5

@@ -28,6 +28,7 @@ The project emphasizes reproducibility, consistent business logic, automated cor
 | Data format | CSV |
 | Data generation | Python |
 | Benchmark automation | Python |
+| Build system | CMake |
 | Result validation | CSV comparison and SHA-256 |
 | Data visualization | Matplotlib |
 | Development environment | Visual Studio Code / Windows |
@@ -204,13 +205,32 @@ The example above corresponds to the one-million-flight dataset.
 
 The commands below assume **Windows PowerShell** and the Microsoft Visual C++ compiler.
 
-### 1. Compile the C++ Benchmark
 
-Open a terminal with the MSVC build environment configured and run:
+### 1. Build the C++ Project with CMake
+
+The project uses CMake to configure and build the C++17 executables.
+
+On Windows, with Visual Studio 2022 installed:
 
 ```powershell
-cl /EHsc /std:c++17 /W4 /O2 .\cpp\benchmark.cpp /Fe:benchmark-cpp.exe
+cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 ```
+
+Compile the Release configuration:
+
+```powershell
+cmake --build build --config Release
+```
+
+This generates two executables:
+
+- `build/Release/airline-engine.exe`
+- `build/Release/benchmark-cpp.exe`
+
+The benchmark automation uses the Release executable.
+
+Run all commands from the project root directory.
+
 
 ### 2. Install the Visualization Dependency
 

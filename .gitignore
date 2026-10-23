@@ -14,3 +14,6 @@ data/*.csv
 
 # VS Code local settings
 .vscode/
+
+# CMake build directory
+build/
