@@ -12,6 +12,7 @@
 #include "offer_sort.h"
 #include <stdexcept>
 
+
 // Flight information
 struct Flight {
     std::string flightNumber;
@@ -66,16 +67,18 @@ long long calculatePriceCents(const Flight& flight) {
 
 // Filter, calculate and sort offers
 std::vector<Offer> processOffers(
-    const std::vector<Flight>& flights
+    const std::vector<Flight>& flights,
+    const std::string& requestedOrigin,
+    const std::string& requestedDestination
 ) {
     std::vector<Offer> matchingOffers;
 
    for (const Flight& flight : flights) {
     if (matchesRoute(
-            flight.origin,
-            flight.destination,
-            "BOG",
-            "MIA")) {
+        flight.origin,
+        flight.destination,
+        requestedOrigin,
+        requestedDestination)) {
 
         matchingOffers.push_back({
             calculatePriceCents(flight),
@@ -84,24 +87,27 @@ std::vector<Offer> processOffers(
     }
 }
 
-    std::sort(
-    matchingOffers.begin(),
-    matchingOffers.end(),
-    [](const Offer& a, const Offer& b) {
-        return offerComesFirst(
-            a.totalPriceCents,
-            a.flightNumber,
-            b.totalPriceCents,
-            b.flightNumber
-        );
-    }
-);
+    sortOffers(matchingOffers);
 
     return matchingOffers;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     try {
+        std::string requestedOrigin = "BOG";
+std::string requestedDestination = "MIA";
+
+if (argc == 3)
+{
+    requestedOrigin = argv[1];
+    requestedDestination = argv[2];
+}
+else if (argc != 1)
+{
+    throw std::invalid_argument(
+        "Usage: benchmark-cpp [ORIGIN DESTINATION]"
+    );
+}
         const int repetitions = 10;
 
         std::vector<Flight> flights =
@@ -109,17 +115,29 @@ int main() {
 
         std::cout << "=== C++ AIRLINE OFFER BENCHMARK ===\n";
         std::cout << "Flights loaded: " << flights.size() << "\n";
-        std::cout << "Route: BOG -> MIA\n";
+        std::cout << "Route: "
+          << requestedOrigin
+          << " -> "
+          << requestedDestination
+          << "\n";
 
         // Warm-up
-        std::vector<Offer> result = processOffers(flights);
+        std::vector<Offer> result = processOffers(
+    flights,
+    requestedOrigin,
+    requestedDestination
+);
 
         std::vector<double> executionTimes;
 
         for (int i = 0; i < repetitions; i++) {
             auto start = std::chrono::steady_clock::now();
 
-            result = processOffers(flights);
+            result = processOffers(
+    flights,
+    requestedOrigin,
+    requestedDestination
+);
 
             auto end = std::chrono::steady_clock::now();
 

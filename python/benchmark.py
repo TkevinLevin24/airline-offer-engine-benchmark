@@ -1,7 +1,7 @@
-
 import csv
 import time
 import statistics
+import sys
 from pathlib import Path
 
 # Configuration
@@ -43,13 +43,17 @@ def calculate_price_cents(flight):
     return base_fare + taxes + service_fee
 
 
-def process_offers(flights):
+def process_offers(
+    flights,
+    origin=SEARCH_ORIGIN,
+    destination=SEARCH_DESTINATION
+):
     matching_offers = []
 
     for flight in flights:
         if (
-            flight["origin"] == SEARCH_ORIGIN
-            and flight["destination"] == SEARCH_DESTINATION
+            flight["origin"] == origin
+            and flight["destination"] == destination
         ):
             total_price = calculate_price_cents(flight)
 
@@ -65,14 +69,29 @@ def process_offers(flights):
 
 
 def main():
+    origin = SEARCH_ORIGIN
+    destination = SEARCH_DESTINATION
+
+    # Read command-line arguments
+    if len(sys.argv) == 3:
+        origin = sys.argv[1]
+        destination = sys.argv[2]
+
+    elif len(sys.argv) != 1:
+        print(
+            "Usage: python benchmark.py [ORIGIN DESTINATION]",
+            file=sys.stderr
+        )
+        return 1
+
     flights = load_flights()
 
     print("=== PYTHON AIRLINE OFFER BENCHMARK ===")
     print(f"Flights loaded: {len(flights)}")
-    print(f"Route: {SEARCH_ORIGIN} -> {SEARCH_DESTINATION}")
+    print(f"Route: {origin} -> {destination}")
 
     # Warm-up
-    process_offers(flights)
+    process_offers(flights, origin, destination)
 
     execution_times = []
     result = []
@@ -80,7 +99,11 @@ def main():
     for _ in range(REPETITIONS):
         start = time.perf_counter()
 
-        result = process_offers(flights)
+        result = process_offers(
+            flights,
+            origin,
+            destination
+        )
 
         end = time.perf_counter()
 
@@ -97,7 +120,6 @@ def main():
     for price_cents, flight_number in result[:5]:
         print(f"{flight_number}: USD {price_cents / 100:.2f}")
 
-        
     # Export all processed offers for validation
     output_file = project_root / "data" / "python_results.csv"
 
@@ -110,7 +132,8 @@ def main():
 
     print(f"\nValidation file: {output_file}")
 
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
